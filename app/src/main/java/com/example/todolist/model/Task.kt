@@ -1,9 +1,7 @@
 package com.example.todolist
 
-import android.text.Editable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
 
 //data class TaskModel(var Id : Int, var Title: String, var Description: String, var Date: Long, var Priority: TaskPriority, var Completed:Boolean)
 @Entity
@@ -19,5 +17,17 @@ data class Task(
 
 enum class TaskPriority
 {
-    HIGH,MIDDLE,LOW
+    HIGH,
+    MIDDLE,
+    LOW;
+
+    private var priority: String = ""
+
+    open fun Priorities(aState: String) {
+        priority = aState
+    }
+
+//    override fun toString(): String {
+//        return priority
+//    }
 }

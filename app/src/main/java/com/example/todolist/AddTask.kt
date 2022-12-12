@@ -6,8 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.annotation.NonNull
+import androidx.annotation.RestrictTo
 import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
+import com.example.todolist.data.AppDatabase
 import com.example.todolist.model.DateTime
+import java.lang.Exception
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,6 +36,10 @@ class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         saveButton.setOnClickListener(View.OnClickListener {
             saveTask()
         })
+        val mySpinner = (findViewById(R.id.spinnerPriority)) as Spinner
+
+        mySpinner.adapter = ArrayAdapter<TaskPriority>(this, android.R.layout.simple_list_item_1, TaskPriority.values())
+
 
         pickDate()
     }
@@ -49,6 +58,12 @@ class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         val priority = (findViewById<Spinner>(R.id.spinnerPriority) as Spinner).selectedItem as TaskPriority
         val completed = (findViewById<CheckBox>(R.id.checkBoxCompleted) as CheckBox).isChecked
         val task : Task = Task(Title = title, Description = desc, Date = date, Priority = priority, Completed = completed)
+        if (!saveInDatabase(task))
+        {
+            val toast = Toast.makeText(this, "FAIL I can't save your task :(", Toast.LENGTH_SHORT)
+            toast.show()
+        }
+
         closeThisActivity()
     }
 
@@ -91,5 +106,17 @@ class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     private fun getTimestamp(s: String): Long {
         val formatter: DateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm")
         return formatter.parse(s).time
+    }
+
+    private fun saveInDatabase(task: Task): Boolean{
+        try {
+            val db = AppDatabase.getDb(this).taskDao()
+            Thread{
+                db.insertTask(task)
+            }.start()
+            return true
+        } catch(ex: Exception) {
+            return false
+        }
     }
 }

@@ -38,7 +38,7 @@ class DoList : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyDoItemRecyclerViewAdapter(PlaceholderContent.ITEMS)
+                adapter = MyDoItemRecyclerViewAdapter(List<Task>)
             }
         }
         return view

@@ -9,43 +9,40 @@ import android.widget.TextView
 
 import com.example.todolist.placeholder.PlaceholderContent.PlaceholderItem
 import com.example.todolist.databinding.FragmentDoListItemBinding
+import com.example.todolist.model.DateTime
+import java.text.SimpleDateFormat
+import java.util.*
 
-/**
- * [RecyclerView.Adapter] that can display a [PlaceholderItem].
- * TODO: Replace the implementation with code for your data type.
- */
+
+
 class MyDoItemRecyclerViewAdapter(
-    private val values: List<PlaceholderItem>
-) : RecyclerView.Adapter<MyDoItemRecyclerViewAdapter.ViewHolder>() {
+    private val values: List<Task>
+) : RecyclerView.Adapter<MyDoItemRecyclerViewAdapter.TaskHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    class TaskHolder(item:View): RecyclerView.ViewHolder(item)
+    {
+        val binding = FragmentDoListItemBinding.bind(item)
+        fun bind(task: Task) = with(binding){
+            checkBoxTitle.text = task.Title
+            checkBoxTitle.isChecked = task.Completed
 
-        return ViewHolder(
-            FragmentDoListItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        )
-
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        //holder.itemCheckBox.text = item.id
-        //holder.itemTextView.text = item.content
-    }
-
-    override fun getItemCount(): Int = values.size
-
-    inner class ViewHolder(binding: FragmentDoListItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        val itemCheckBox: CheckBox = binding.checkBox
-        val itemTextView: TextView = binding.textView
-
-        override fun toString(): String {
-            return super.toString() + " '" + itemCheckBox.text + "'"
+            val dateFormatter = SimpleDateFormat("MM.dd.yyyy hh:mm")
+            textDate.text = dateFormatter.format(Date(task.Date))
         }
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskHolder {
+       val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_do_list_item,parent,false)
+        return TaskHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: TaskHolder, position: Int) {
+        holder.bind(values[position])
+    }
+
+    override fun getItemCount(): Int {
+        return values.size
+    }
+
 
 }

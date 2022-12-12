@@ -28,11 +28,21 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginHorizontal="5dp"
             android:contentDescription="scrollForList">
-<!--            <fragment-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                tools:layout="@layout/fragment_do_list"/>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <fragment
+                    android:id="@+id/todolist"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:layout="@layout/fragment_do_list">
+
+                </fragment>
+            </LinearLayout>
 
         </ScrollView>
     </LinearLayout>
