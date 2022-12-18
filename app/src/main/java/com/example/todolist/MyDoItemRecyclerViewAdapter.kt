@@ -4,12 +4,8 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.TextView
 
-import com.example.todolist.placeholder.PlaceholderContent.PlaceholderItem
 import com.example.todolist.databinding.FragmentDoListItemBinding
-import com.example.todolist.model.DateTime
 import java.text.SimpleDateFormat
 import java.util.*
 

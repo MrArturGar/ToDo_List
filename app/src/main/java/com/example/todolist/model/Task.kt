@@ -14,6 +14,12 @@ data class Task(
     var Priority: TaskPriority,
     var Completed:Boolean
     )
+{
+    companion object
+    {
+        var TaskList : List<Task>? = null
+    }
+}
 
 enum class TaskPriority
 {
@@ -26,8 +32,4 @@ enum class TaskPriority
     open fun Priorities(aState: String) {
         priority = aState
     }
-
-//    override fun toString(): String {
-//        return priority
-//    }
 }

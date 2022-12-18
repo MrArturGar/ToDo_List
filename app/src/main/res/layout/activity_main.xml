@@ -35,13 +35,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <fragment
-                    android:id="@+id/todolist"
+<!--                <fragment-->
+<!--                    android:id="@+id/todolist"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    tools:layout="@layout/fragment_do_list">-->
+
+<!--                </fragment>-->
+                <androidx.fragment.app.FragmentContainerView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:layout="@layout/fragment_do_list">
-
-                </fragment>
+                    android:id="@+id/fragment_container_view"/>
             </LinearLayout>
 
         </ScrollView>

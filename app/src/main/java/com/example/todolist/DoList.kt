@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.todolist.placeholder.PlaceholderContent
 
 /**
  * A fragment representing a list of Items.
@@ -38,7 +37,9 @@ class DoList : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyDoItemRecyclerViewAdapter(List<Task>)
+//                adapter = MyDoItemRecyclerViewAdapter(TaskholderContent.ITEMS)
+
+                adapter = Task.TaskList?.toList()?.let { MyDoItemRecyclerViewAdapter(it) }
             }
         }
         return view
