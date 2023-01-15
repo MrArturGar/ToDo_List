@@ -1,29 +1,36 @@
 package com.example.todolist
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import androidx.annotation.NonNull
-import androidx.annotation.RestrictTo
 import androidx.appcompat.app.AppCompatActivity
-import androidx.room.Room
+import androidx.core.view.isVisible
 import com.example.todolist.data.AppDatabase
 import com.example.todolist.model.DateTime
-import java.lang.Exception
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+
+class AddTask() : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     private var dateTime : DateTime = DateTime()
     private var dateTimeSaved: DateTime = DateTime()
+    private lateinit var currentTask: Task
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        var taskId = intent.getIntExtra("taskId", 0)
+        if (taskId != 0)
+        {
+            Task.TaskList?.forEach { if (it.Id == taskId) { currentTask = it }}
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
@@ -36,12 +43,39 @@ class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         saveButton.setOnClickListener(View.OnClickListener {
             saveTask()
         })
-        val mySpinner = (findViewById(R.id.spinnerPriority)) as Spinner
 
+        loadTask()
+        pickDate()
+    }
+
+    private fun loadTask()
+    {
+        val daleteButton = findViewById<Button>(R.id.buttonDelete)
+        val mySpinner = (findViewById(R.id.spinnerPriority)) as Spinner
         mySpinner.adapter = ArrayAdapter<TaskPriority>(this, android.R.layout.simple_list_item_1, TaskPriority.values())
 
+        if (this::currentTask.isInitialized) {
+            mySpinner.setSelection(currentTask.Priority.ordinal)
 
-        pickDate()
+            val title = (findViewById(R.id.editTextTitle)) as EditText
+            title.setText(currentTask.Title)
+
+            val desc = (findViewById(R.id.editTextDesc)) as EditText
+            desc.setText(currentTask.Description)
+
+            val dateText = (findViewById(R.id.textViewDate)) as TextView
+            val dateFormatter = SimpleDateFormat("dd.MM.yyyy hh:mm")
+            dateText.text = dateFormatter.format(Date(currentTask.Date))
+
+            val completed = (findViewById(R.id.checkBoxCompleted)) as CheckBox
+            completed.isChecked = currentTask.Completed
+
+            daleteButton.isVisible = true
+            daleteButton.setOnClickListener(View.OnClickListener {
+                deleteTask()
+                closeThisActivity()
+            })
+        }
     }
 
     private fun closeThisActivity()
@@ -57,14 +91,38 @@ class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         val date =  getTimestamp((findViewById<TextView>(R.id.textViewDate) as TextView).text.toString())
         val priority = (findViewById<Spinner>(R.id.spinnerPriority) as Spinner).selectedItem as TaskPriority
         val completed = (findViewById<CheckBox>(R.id.checkBoxCompleted) as CheckBox).isChecked
+
         val task : Task = Task(Title = title, Description = desc, Date = date, Priority = priority, Completed = completed)
-        if (!saveInDatabase(task))
+
+        if (this::currentTask.isInitialized) {
+            task.Id = currentTask.Id
+            if (!updateInDatabase(task))
+            {
+                val toast = Toast.makeText(this, "FAIL I can't update your task :(", Toast.LENGTH_SHORT)
+                toast.show()
+            }
+        }
+        else (!insertInDatabase(task))
         {
             val toast = Toast.makeText(this, "FAIL I can't save your task :(", Toast.LENGTH_SHORT)
             toast.show()
         }
 
         closeThisActivity()
+    }
+
+    private fun deleteTask()
+    {
+        try {
+            val db = AppDatabase.getDb(this).taskDao()
+            Thread{
+                db.delete(currentTask)
+            }.start()
+        } catch(ex: Exception) {
+            val toast = Toast.makeText(this, "FAIL I can't delete this task :(", Toast.LENGTH_SHORT)
+            toast.show()
+        }
+
     }
 
     private fun getDateTimeCalendar()
@@ -89,7 +147,7 @@ class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         dateTimeSaved.day = dayOfMonth
-        dateTimeSaved.month = month
+        dateTimeSaved.month = month+1
         dateTimeSaved.year = year
         getDateTimeCalendar()
         TimePickerDialog(this, this, dateTime.hour, dateTime.minute, true).show()
@@ -100,19 +158,30 @@ class AddTask : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         dateTimeSaved.minute = minute
 
         val textDate = findViewById<TextView>(R.id.textViewDate) as TextView
-        textDate.setText("${dateTimeSaved.day}-${dateTimeSaved.month}-${dateTimeSaved.year} ${dateTimeSaved.hour}:${dateTimeSaved.minute}")
+        textDate.setText("${dateTimeSaved.day}.${dateTimeSaved.month}.${dateTimeSaved.year} ${dateTimeSaved.hour}:${dateTimeSaved.minute}")
     }
 
     private fun getTimestamp(s: String): Long {
-        val formatter: DateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm")
+        val formatter: DateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm")
         return formatter.parse(s).time
     }
 
-    private fun saveInDatabase(task: Task): Boolean{
+    private fun insertInDatabase(task: Task): Boolean{
         try {
             val db = AppDatabase.getDb(this).taskDao()
             Thread{
                 db.insertTask(task)
+            }.start()
+            return true
+        } catch(ex: Exception) {
+            return false
+        }
+    }
+    private fun updateInDatabase(task: Task): Boolean{
+        try {
+            val db = AppDatabase.getDb(this).taskDao()
+            Thread{
+                db.updateTask(task)
             }.start()
             return true
         } catch(ex: Exception) {

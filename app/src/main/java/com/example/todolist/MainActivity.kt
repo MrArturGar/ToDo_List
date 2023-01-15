@@ -11,8 +11,9 @@ import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.data.AppDatabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.Serializable
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MyDoItemRecyclerViewAdapter.ITaskItemListener {
 
     private lateinit var taskList: FrameLayout
 
@@ -30,17 +31,20 @@ class MainActivity : AppCompatActivity() {
         db.getAll().asLiveData().observe(this){
             Task.TaskList = it
             if (savedInstanceState == null) {
-                val fragment = DoList.newInstance(0)
+                val fragment = DoList.newInstance(0, this)
                 supportFragmentManager
                     .beginTransaction()
                     .add(R.id.fragment_container_view,fragment, "fragment_tag")
                     .commit()
             }
         }
-
     }
 
-    private fun loadTaskItems(){
+    override fun OnClick(task: Task)
+    {
+        val intent = Intent(this, AddTask::class.java)
+        intent.putExtra("taskId", task.Id)
+        startActivity(intent)
     }
 
 }

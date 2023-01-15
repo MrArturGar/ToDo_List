@@ -1,9 +1,6 @@
 package com.example.todolist.data
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.example.todolist.Task
 import kotlinx.coroutines.flow.Flow
 
@@ -14,7 +11,10 @@ public interface TaskDao {
     fun getAll(): Flow<List<Task>>
 
     @Insert
-    fun insertTask(vararg task : Task)
+    fun insertTask(task : Task)
+
+    @Update
+    fun updateTask(task: Task)
 
     @Delete
     fun delete(task: Task)

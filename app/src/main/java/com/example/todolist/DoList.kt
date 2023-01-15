@@ -12,7 +12,7 @@ import android.view.ViewGroup
 /**
  * A fragment representing a list of Items.
  */
-class DoList : Fragment() {
+class DoList(val Listener: MyDoItemRecyclerViewAdapter.ITaskItemListener) : Fragment() {
 
     private var columnCount = 1
 
@@ -39,7 +39,7 @@ class DoList : Fragment() {
                 }
 //                adapter = MyDoItemRecyclerViewAdapter(TaskholderContent.ITEMS)
 
-                adapter = Task.TaskList?.toList()?.let { MyDoItemRecyclerViewAdapter(it) }
+                adapter = Task.TaskList?.toList()?.let { MyDoItemRecyclerViewAdapter(it,Listener) }
             }
         }
         return view
@@ -52,8 +52,8 @@ class DoList : Fragment() {
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int) =
-            DoList().apply {
+        fun newInstance(columnCount: Int, listener: MyDoItemRecyclerViewAdapter.ITaskItemListener) =
+            DoList(listener).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                 }
